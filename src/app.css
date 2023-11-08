@@ -76,3 +76,11 @@ nav {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+#app {
+  height: 100vh;
+  max-height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  overflow: auto;
+}

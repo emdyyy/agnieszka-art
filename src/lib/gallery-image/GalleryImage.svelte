@@ -15,7 +15,7 @@
   }
 </script>
 
-<div use:whenInViewport>
+<div use:whenInViewport class="pb-5">
   <div
     class={`relative w-full w-96 transition-all duration-300 transition-all duration-500 ${
       isVisible ? "opacity-1 blur-none" : "opacity-0 blur-md"

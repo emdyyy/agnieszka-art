@@ -1,51 +1,12 @@
 <script lang="ts">
   import Footer from "$lib/footer/Footer.svelte";
-  import GalleryImage from "$lib/gallery-image/GalleryImage.svelte";
   import ImageGallery from "$lib/image-gallery/ImageGallery.svelte";
   import Navbar from "$lib/navbar/Navbar.svelte";
   import SectionHeading from "$lib/section-heading/SectionHeading.svelte";
-  import { blur } from "svelte/transition";
+  import type { PageData } from "./$types";
+  import MainGallery from "$lib/main-gallery/MainGallery.svelte";
 
-  const galleryList = [
-    {
-      src: "/images/gallery/gallery-1.jpg",
-      alt: "Portret czerwonowłosej dziewczynki",
-    },
-    {
-      src: "/images/gallery/gallery-2.jpg",
-      alt: "Obraz szarego kota",
-    },
-    {
-      src: "/images/gallery/gallery-3.jpg",
-      alt: "Portret młodej dziewczyny z blond włosami",
-    },
-    {
-      src: "/images/gallery/gallery-4.jpg",
-      alt: "Obray trzy-osobowej rodziny z dzieckiem",
-    },
-    {
-      src: "/images/gallery/gallery-5.jpg",
-      alt: "Portret historyczny Józefa Piłsudskiego",
-    },
-    {
-      src: "/images/gallery/gallery-6.jpg",
-      alt: "Portret małego dziecka w kapeluszu",
-    },
-    {
-      src: "/images/gallery/gallery-7.jpg",
-      alt: "Portret młodej pary",
-    },
-    {
-      src: "/images/gallery/gallery-9.jpg",
-      alt: "Portret nastolatki",
-    },
-  ];
-  const sliceSize = 3;
-  const out: Array<Array<{ src: string; alt: string }>> = [];
-  for (let i = 0; i < galleryList.length; i += sliceSize) {
-    const slice = galleryList.slice(i, i + sliceSize);
-    out.push(slice);
-  }
+  export let data: PageData;
 </script>
 
 <svelte:head>
@@ -88,14 +49,14 @@
       <div class="flex flex-col md:flex-row gap-5 m-5 md:m-12">
         <a href="#kontakt">
           <button
-            class="w-full transition-all duration-300 uppercase p-3 px-10 bg-primary-100 hover:bg-primary-300 text-white active:bg-primary-300"
+            class="w-full transition-all duration-300 uppercase p-3 px-10 bg-primary-100 hover:bg-primary-300 text-black active:bg-primary-300"
           >
             Kontakt
           </button>
         </a>
         <a href="#galeria">
           <button
-            class="w-full transition-all duration-300 uppercase p-3 px-10 border border-primary-100 border-solid hover:bg-primary-300 hover:text-white text-primary-100 hover:border-primary-300 active:bg-primary-300"
+            class="w-full transition-all duration-300 uppercase p-3 px-10 border border-primary-100 border-solid hover:bg-primary-300 text-black hover:border-primary-300 active:bg-primary-300"
           >
             Więcej
           </button>
@@ -103,22 +64,13 @@
       </div>
     </div>
     <div class="flex-col justify-center h-full hidden lg:flex">
-      <ImageGallery />
+      {#if data.headerGalleryImages}
+        <ImageGallery images={data.headerGalleryImages} />
+      {/if}
     </div>
   </header>
   <main class="max-w-screen-xl mx-auto">
-    <section class="mb-10" id="galeria">
-      <SectionHeading>Galeria</SectionHeading>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {#each out as slice}
-          <div class="flex flex-col gap-4">
-            {#each slice as element}
-              <GalleryImage imgSrc={element.src} imgAlt={element.alt} />
-            {/each}
-          </div>
-        {/each}
-      </div>
-    </section>
+    <MainGallery data={data.mainGalleryImages} />
     <section class="flex flex-col lg:h-screen" id="o-mnie">
       <SectionHeading>O mnie</SectionHeading>
       <div
