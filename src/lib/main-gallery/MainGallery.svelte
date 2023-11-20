@@ -26,14 +26,20 @@
     return builder.image(source);
   }
 
+  let images: Array<
+    {
+      imageTitle: string;
+      imageUrl: string;
+    }[]
+  > = [];
   const pageSize = 12;
-  $: images = data;
   $: currentPage = 0;
   $: maxPage = 0;
   $: isLoading = false;
 
   onMount(async () => {
     isLoading = true;
+    if (data) images = [data];
     const amountOfEntries = await client.fetch(
       `count(*[_type == "main-gallery"])`
     );
@@ -47,17 +53,20 @@
       imageTitle: string;
       mainGalleryImage: SanityImageSource;
     }> =
-      await client.fetch(`*[_type == "main-gallery"] | order(_createdAt desc) [${
+      await client.fetch(`*[_type == "main-gallery"] | order(_createdAt desc) [${Math.abs(
         currentPage * amount
-      }...${currentPage * amount + pageSize}]{
+      )}...${Math.abs(currentPage * amount) + pageSize}]{
     imageTitle,
     mainGalleryImage
   }`);
 
-    images = result.map((entry) => ({
-      imageTitle: entry.imageTitle,
-      imageUrl: urlFor(entry.mainGalleryImage).url(),
-    }));
+    images = [
+      ...images,
+      result.map((entry) => ({
+        imageTitle: entry.imageTitle,
+        imageUrl: urlFor(entry.mainGalleryImage).url(),
+      })),
+    ];
     isLoading = false;
   };
 </script>
@@ -65,36 +74,24 @@
 <section class="mb-10 flex flex-col justify-center w-full" id="galeria">
   <SectionHeading>Galeria</SectionHeading>
   {#if images}
-    <div class="columns-3xs gap-5">
-      {#each images as image}
-        <GalleryImage imgSrc={image.imageUrl} imgAlt={image.imageTitle} />
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+      {#each images as slice}
+        {#each slice as image}
+          <GalleryImage imgSrc={image.imageUrl} imgAlt={image.imageTitle} />
+        {/each}
       {/each}
     </div>
     <div class="flex justify-center">
-      <a href="#galeria"
-        ><button
-          disabled={currentPage <= 0 || isLoading}
-          on:click={() => {
-            currentPage--;
-            load(-pageSize);
-          }}
-          class="transition-all duration-300 uppercase p-3 px-10 bg-primary-100 hover:bg-primary-300 text-black active:bg-primary-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-        >
-          {"<"}
-        </button>
-      </a>
-      <a href="#galeria">
-        <button
-          on:click={() => {
-            currentPage++;
-            load(pageSize);
-          }}
-          disabled={currentPage >= maxPage || isLoading}
-          class="transition-all duration-300 uppercase p-3 px-10 bg-primary-100 hover:bg-primary-300 text-black active:bg-primary-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-        >
-          {">"}
-        </button>
-      </a>
+      <button
+        on:click={() => {
+          currentPage++;
+          load(pageSize);
+        }}
+        disabled={currentPage >= maxPage || isLoading}
+        class="transition-all duration-300 uppercase p-3 px-10 bg-primary-100 hover:bg-primary-300 text-black active:bg-primary-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed m-5"
+      >
+        Więcej
+      </button>
     </div>
   {:else}
     <p>Wystąpił błąd podczas ładowania galerii</p>
